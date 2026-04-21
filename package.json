@@ -1,0 +1,9 @@
+{
+  "name": "nexus-manager",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "cd frontend && npm i && npm run build && mkdir -p ../src/main/resources/static && rm -rf ../src/main/resources/static/* && cp -r out/* ../src/main/resources/static/ && cd .. && ./mvnw spring-boot:run",
+    "docker": "docker build -t nexus:latest . && docker stop nexus-app 2>/dev/null || true && docker rm nexus-app 2>/dev/null || true && docker run -d --name nexus-app -p 8080:8080 nexus:latest"
+  }
+}

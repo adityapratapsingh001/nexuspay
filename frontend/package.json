@@ -1,0 +1,30 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "full-stack": "next build && mkdir -p ../src/main/resources/static && rm -rf ../src/main/resources/static/* && cp -r out/* ../src/main/resources/static/ && cd .. && ./mvnw spring-boot:run"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
+    "cheerio": "^1.1.2",
+    "cookie": "^1.1.1",
+    "jose": "^6.1.2",
+    "next": "^16.0.7",
+    "pg": "^8.16.3",
+    "qrcode": "^1.5.4",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-icons": "^5.5.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "baseline-browser-mapping": "^2.8.32",
+    "tailwindcss": "^4"
+  }
+}

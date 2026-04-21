@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3395FF; /* Razorpay Blue */
+  --color-secondary: #02042b;
+  --color-accent: #528FF0;
+  --color-background: #f5f7fa;
+  --color-card: #ffffff;
+  --color-text-main: #1c1c1c;
+  --color-text-muted: #5d6675;
+}
+
+body {
+  @apply bg-[var(--color-background)] text-[var(--color-text-main)] font-sans antialiased;
+}
+
+.razor-card {
+  @apply bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow;
+}
+
+.razor-button {
+  @apply bg-[var(--color-primary)] text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.razor-input {
+  @apply w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] outline-none transition-all bg-white text-[var(--color-text-main)];
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
