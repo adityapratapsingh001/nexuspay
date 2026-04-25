@@ -11,8 +11,10 @@ import {
   MdAssessment,
   MdSettings,
   MdHelp,
-  MdClose
+  MdClose,
+  MdCode
 } from "react-icons/md";
+
 
 const menuItems = [
   { name: "Dashboard", href: "/dashboard", icon: MdDashboard },
@@ -21,7 +23,9 @@ const menuItems = [
   { name: "Payment Links", href: "/dashboard/payment-links", icon: MdLink },
   { name: "Orders", href: "/dashboard/orders", icon: MdShoppingCart },
   { name: "Reports", href: "/dashboard/reports", icon: MdAssessment },
+  { name: "Developer Docs", href: "/dashboard/docs", icon: MdCode },
 ];
+
 
 export default function Sidebar({ isOpen, setIsOpen, data }) {
   const pathname = usePathname();
@@ -75,22 +79,21 @@ export default function Sidebar({ isOpen, setIsOpen, data }) {
 
             <div className="pt-8 mt-8 border-t border-slate-50">
               <p className="px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Support</p>
-              <Link href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-500 hover:text-[#02042b] hover:bg-slate-50 transition-all">
+              <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-500 hover:text-[#02042b] hover:bg-slate-50 transition-all">
                 <MdSettings className="text-xl text-slate-400" /> Settings
               </Link>
-              <Link href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-500 hover:text-[#02042b] hover:bg-slate-50 transition-all">
-                <MdHelp className="text-xl text-slate-400" /> API Docs
-              </Link>
             </div>
+
           </nav>
 
           <div className="p-4 border-t border-slate-100 bg-slate-50/50">
             <div className="flex items-center gap-3 mb-4 px-2">
               <div className="font-black w-10 h-10 rounded-full bg-[#3395FF] flex items-center justify-center text-sm text-white shadow-lg shadow-blue-500/20">
-                {data?.business_name ? data.business_name[0].toUpperCase() : "N"}
+                {data?.businessName ? data.businessName[0].toUpperCase() : "N"}
               </div>
               <div className="flex-1 overflow-hidden">
-                <p className="text-xs font-black text-[#02042b] truncate">{data?.business_name || "Nexus Merchant"}</p>
+                <p className="text-xs font-black text-[#02042b] truncate">{data?.businessName || "Nexus Merchant"}</p>
+
                 <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                     <p className="text-[10px] font-bold text-green-600 uppercase">Live Mode</p>

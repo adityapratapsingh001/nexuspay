@@ -88,7 +88,16 @@ public class PaymentController {
 
             Order order = orderOpt.get();
             if (order.getStatus() == OrderStatus.PAID) {
-                return ResponseEntity.ok(Map.of("status", "received", "oid", order.getOrderId()));
+                return ResponseEntity.ok(Map.of(
+                    "status", "received", 
+                    "oid", order.getOrderId(),
+                    "returnUrl", order.getReturnUrl() != null ? order.getReturnUrl() : ""
+                ));
+            }
+
+
+            if (request.getTimestamp() == null) {
+                return ResponseEntity.status(400).body(Map.of("error", "Timestamp is required"));
             }
 
             List<Map<String, Object>> transactions = transactionService.fetchTransactions(request.getTimestamp());
@@ -97,13 +106,22 @@ public class PaymentController {
                 order.setStatus(OrderStatus.PAID);
                 order.setPaidAt(LocalDateTime.now());
                 orderRepository.save(order);
-                return ResponseEntity.ok(Map.of("status", "received", "oid", order.getOrderId()));
+                return ResponseEntity.ok(Map.of(
+                    "status", "received", 
+                    "oid", order.getOrderId(),
+                    "returnUrl", order.getReturnUrl() != null ? order.getReturnUrl() : ""
+                ));
+
             }
 
-            return ResponseEntity.ok(Map.of("status", "pending", "oid", null));
+            return ResponseEntity.ok(Map.of("status", "pending", "oid", ""));
         } catch (Exception e) {
             log.error("Verification Error: ", e);
-            return ResponseEntity.status(500).body(Map.of("status", "error", "message", e.getMessage()));
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage() != null ? e.getMessage() : "Unknown error");
+            return ResponseEntity.status(500).body(errorResponse);
         }
     }
 }
+

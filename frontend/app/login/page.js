@@ -20,10 +20,17 @@ export default function LoginPage() {
             });
             const data = await res.json();
             if (data.auth) {
-                window.location.href = "/dashboard";
+                localStorage.setItem("userEmail", email);
+                if (data.onboarded) {
+                    window.location.href = "/dashboard";
+                } else {
+                    window.location.href = "/onboarding";
+                }
             } else {
+
                 setError(data.error || "Invalid credentials");
             }
+
         } catch (err) {
             setError("Something went wrong");
         } finally {

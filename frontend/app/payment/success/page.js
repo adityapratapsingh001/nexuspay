@@ -52,55 +52,78 @@ export default function PaymentSuccess() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f8fbff] flex flex-col items-center py-20 px-4 font-sans text-[#02042b]">
+    <div className="min-h-screen bg-[#f8fbff] flex flex-col items-center justify-center p-4 font-sans text-[#02042b] relative overflow-hidden">
+      
+      {/* BACKGROUND DECOR */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full" />
+        <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full" />
+      </div>
+
       {/* Header */}
-      <div className="flex items-center gap-2 mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
-        <img src="/logo.png" className="w-8 h-8" alt="Logo" />
-        <span className="text-xl font-black">NexusPay</span>
+      <div className="flex items-center gap-3 mb-10 relative z-10 animate-in fade-in slide-in-from-top-4 duration-700">
+        <img src="/logo.png" className="w-10 h-10" alt="Logo" />
+        <span className="text-2xl font-black tracking-tight">NexusPay</span>
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-md bg-white shadow-2xl shadow-blue-500/5 rounded-[2.5rem] p-10 text-center border border-slate-100 animate-in zoom-in-95 duration-500">
-
-        {/* Animated Success Icon */}
-        <div className="flex justify-center mb-6">
-          <div className="w-24 h-24 rounded-full bg-green-50 flex items-center justify-center text-green-500 text-6xl">
-            <MdCheckCircle />
-          </div>
-        </div>
-
-        <h2 className="text-3xl font-black mb-2">Payment Success!</h2>
-        <p className="text-slate-500 font-medium mb-8">Funds have been successfully sent.</p>
-
-        {/* Merchant Info */}
-        <div className="bg-slate-50 rounded-2xl p-6 mb-6">
-            <div className="flex flex-col items-center gap-2 mb-4">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Paid To</p>
-                <div className="flex items-center justify-center gap-1">
-                    <h3 className="text-[#02042b] font-bold text-lg">{mname}</h3>
-                    <MdVerified className="text-[#3395FF]" />
+      <div className="w-full max-w-md bg-white shadow-2xl shadow-blue-500/10 rounded-[2.5rem] overflow-hidden border border-slate-100 relative z-10 animate-in zoom-in-95 duration-500">
+        
+        <div className="p-10 text-center">
+            {/* Animated Success Icon */}
+            <div className="flex justify-center mb-8">
+                <div className="w-24 h-24 rounded-full bg-green-50 flex items-center justify-center text-green-500 text-6xl shadow-inner shadow-green-200/20">
+                    <MdCheckCircle className="animate-in zoom-in-50 duration-500" />
                 </div>
             </div>
-            
-            <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-                <span className="text-xs font-bold text-slate-400 uppercase">Amount</span>
-                <span className="text-xl font-black text-[#02042b]">₹{amount}</span>
+
+            <h2 className="text-3xl font-black mb-2 tracking-tight">Payment Successful</h2>
+            <p className="text-slate-400 font-medium text-sm mb-10 uppercase tracking-widest leading-relaxed">Transaction Receipt</p>
+
+            {/* Receipt Details */}
+            <div className="bg-slate-50/50 rounded-3xl p-8 border border-slate-100 text-left space-y-6">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Paid To</p>
+                        <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-lg">{mname}</span>
+                            <MdVerified className="text-[#3395FF]" />
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Amount</p>
+                        <span className="font-black text-2xl">₹{amount}</span>
+                    </div>
+                </div>
+
+                <div className="pt-6 border-t border-slate-100 flex justify-between items-center">
+                    <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Date & Time</p>
+                        <span className="text-xs font-bold text-slate-600">{formattedTime}</span>
+                    </div>
+                    <div className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                        Confirmed
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-10 flex flex-col items-center gap-4">
+                <div className="flex items-center justify-center gap-3 text-slate-400 text-xs font-bold">
+                    <div className="w-4 h-4 border-2 border-blue-500/10 border-t-blue-500 rounded-full animate-spin"></div>
+                    <span>Auto-redirecting in {redirectTime}s</span>
+                </div>
             </div>
         </div>
 
-        {/* Timestamp */}
-        <div className="text-xs font-bold text-slate-400 mb-8 uppercase tracking-widest">{formattedTime}</div>
-
-        {/* Redirecting Message */}
-        <div className="flex items-center justify-center gap-2 text-slate-400 text-sm font-medium">
-            <div className="w-4 h-4 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
-            Redirecting in <strong>{redirectTime}s</strong>
+        <div className="bg-slate-50 p-6 text-center border-t border-slate-100">
+             <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Transaction Secured by Nexus</p>
         </div>
       </div>
 
-      <footer className="mt-12 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em]">
-        © NexusPay — Powered by Payments Infrastructure
+      <footer className="mt-12 relative z-10 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em] opacity-50">
+        Payments Infrastructure © 2026
       </footer>
     </div>
   );
+
 }

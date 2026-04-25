@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface MerchantRepository extends JpaRepository<Merchant, Long> {
     Optional<Merchant> findByEmail(String email);
+    Optional<Merchant> findByApiKeyAndApiSecret(String apiKey, String apiSecret);
 }
+

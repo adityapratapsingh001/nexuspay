@@ -29,4 +29,9 @@ public class MerchantService {
         merchant.setApiSecret("sk_live_" + java.util.UUID.randomUUID().toString().replace("-", ""));
         return merchantRepository.save(merchant);
     }
+
+    public Optional<Merchant> authenticate(String apiKey, String apiSecret) {
+        return merchantRepository.findByApiKeyAndApiSecret(apiKey, apiSecret);
+    }
 }
+

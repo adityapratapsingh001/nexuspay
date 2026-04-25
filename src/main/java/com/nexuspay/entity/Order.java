@@ -20,14 +20,23 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
-    @Column(name = "payment_link")
+    @Column(name = "payment_link", columnDefinition = "TEXT")
     private String paymentLink;
+
     @Column(name = "encrypted_payload", columnDefinition = "TEXT")
     private String encryptedPayload;
 
+    @Column(name = "source")
+    private String source;
+
+    @Column(name = "return_url", columnDefinition = "TEXT")
+    private String returnUrl;
+
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime paidAt;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id")
@@ -36,6 +45,10 @@ public class Order {
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
+
 
     public String getOrderId() { return orderId; }
     public void setOrderId(String orderId) { this.orderId = orderId; }
@@ -60,6 +73,9 @@ public class Order {
 
     public LocalDateTime getPaidAt() { return paidAt; }
     public void setPaidAt(LocalDateTime paidAt) { this.paidAt = paidAt; }
+
+    public String getReturnUrl() { return returnUrl; }
+    public void setReturnUrl(String returnUrl) { this.returnUrl = returnUrl; }
 
     public Merchant getMerchant() { return merchant; }
     public void setMerchant(Merchant merchant) { this.merchant = merchant; }

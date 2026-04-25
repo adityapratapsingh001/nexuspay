@@ -45,15 +45,51 @@ public class AuthController {
 
         Optional<Merchant> merchantOpt = merchantService.findByEmail(email);
         if (merchantOpt.isPresent() && merchantOpt.get().getPassword().equals(password)) {
-            return ResponseEntity.ok(Map.of("message", "Login successful", "auth", true));
+            Merchant merchant = merchantOpt.get();
+            boolean isOnboarded = merchant.getPan() != null && !merchant.getPan().isEmpty();
+            return ResponseEntity.ok(Map.of(
+                "message", "Login successful",
+                "auth", true,
+                "onboarded", isOnboarded,
+                "status", merchant.getStatus()
+            ));
         }
 
         return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
     }
 
+
     @GetMapping("/me")
     public ResponseEntity<?> getMe() {
-        // Simplified for now
-        return ResponseEntity.ok(Map.of("auth", false));
+        // Mocking auth for demo
+        return ResponseEntity.ok(Map.of("auth", true, "email", "demo@nexuspay.com"));
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout() {
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
+
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String currentPassword = request.get("currentPassword");
+        String newPassword = request.get("newPassword");
+
+        Optional<Merchant> merchantOpt = merchantService.findByEmail(email);
+        if (merchantOpt.isPresent()) {
+            Merchant merchant = merchantOpt.get();
+            if (merchant.getPassword().equals(currentPassword)) {
+                merchant.setPassword(newPassword);
+                merchantService.onboard(merchant); // onboard saves the merchant
+                return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
+            } else {
+                return ResponseEntity.status(401).body(Map.of("error", "Current password is incorrect"));
+            }
+        }
+        return ResponseEntity.status(404).body(Map.of("error", "Merchant not found"));
     }
 }
+
+
