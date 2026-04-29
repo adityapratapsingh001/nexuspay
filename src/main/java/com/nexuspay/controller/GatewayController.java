@@ -102,7 +102,7 @@ public class GatewayController {
             
             // Standard origin for API orders (the base URL of this service)
             // In a real app, this would be a config property
-            String origin = request.get("origin") != null ? request.get("origin").toString() : "http://localhost:8080";
+            String origin = request.get("origin") != null ? request.get("origin").toString() : "https://nexus.adityathakur.tech";
             String paymentUrl = origin + "/pay?q=" + encrypted;
 
             Order order = new Order();
