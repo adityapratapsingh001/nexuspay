@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import { MdAccountBalance, MdCheckCircle, MdTimer, MdError, MdInfo, MdHistory } from "react-icons/md";
 import Toast from "@/components/Toast";
+import { getHeaders } from "@/utils/api";
 
 export default function SettlementsPage() {
   const [settlements, setSettlements] = useState([]);
+  const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
   const [toast, setToast] = useState(null);
@@ -20,12 +22,14 @@ export default function SettlementsPage() {
 
   const fetchSettlements = async () => {
     try {
-      const email = localStorage.getItem("userEmail") || "demo@nexuspay.com";
       const res = await fetch("/api/merchant/settlements", {
-        headers: { "X-User-Email": email }
+        headers: getHeaders()
       });
       const data = await res.json();
-      if (Array.isArray(data)) setSettlements(data);
+      if (data.settlements) {
+        setSettlements(data.settlements);
+        setBalance(data.availableBalance);
+      }
     } catch (error) {
       console.error("Error fetching settlements:", error);
     } finally {
@@ -36,10 +40,9 @@ export default function SettlementsPage() {
   const handleRequestSettlement = async () => {
     setRequesting(true);
     try {
-      const email = localStorage.getItem("userEmail") || "demo@nexuspay.com";
       const res = await fetch("/api/merchant/request-settlement", {
         method: "POST",
-        headers: { "X-User-Email": email }
+        headers: getHeaders()
       });
       const data = await res.json();
       if (res.ok) {
@@ -81,7 +84,7 @@ export default function SettlementsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <div className="bg-blue-600 p-10 rounded-[2.5rem] text-white shadow-xl shadow-blue-500/20">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60 mb-2">Available Balance</p>
-              <h3 className="text-4xl font-black mb-6 italic">₹ —</h3>
+              <h3 className="text-4xl font-black mb-6 italic">₹{balance?.toLocaleString()}</h3>
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-white/10 w-fit px-3 py-1.5 rounded-full">
                   <MdInfo className="text-sm" /> T+1 Settlement Cycle
               </div>

@@ -18,6 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/gateway")
+@CrossOrigin("*")
 public class GatewayController {
 
     private final MerchantService merchantService;
@@ -72,8 +73,14 @@ public class GatewayController {
             @RequestHeader("X-API-SECRET") String apiSecret) {
         
         try {
+            System.out.println("Creating Gateway Order for Key: " + apiKey);
+            if (apiKey == null || apiSecret == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "Missing API Credentials in headers (X-API-KEY, X-API-SECRET)"));
+            }
+
             Optional<Merchant> merchantOpt = merchantService.authenticate(apiKey, apiSecret);
             if (merchantOpt.isEmpty()) {
+                System.out.println("Invalid API Credentials for Key: " + apiKey);
                 return ResponseEntity.status(401).body(Map.of("error", "Invalid API Credentials"));
             }
 

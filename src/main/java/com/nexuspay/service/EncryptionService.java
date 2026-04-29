@@ -17,9 +17,10 @@ public class EncryptionService {
     private String encryptionKey;
 
     public String decrypt(String encryptedData) throws Exception {
+        if (encryptedData == null) throw new IllegalArgumentException("Encrypted data is null");
         String[] parts = encryptedData.split(":");
         if (parts.length != 2) {
-            throw new IllegalArgumentException("Invalid encrypted data format");
+            throw new IllegalArgumentException("Invalid encrypted data format: " + encryptedData);
         }
 
         byte[] iv = HexFormat.of().parseHex(parts[0]);

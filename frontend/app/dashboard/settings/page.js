@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { MdSettings, MdLock, MdCheckCircle, MdError } from "react-icons/md";
 import Toast from "@/components/Toast";
+import { getHeaders } from "@/utils/api";
 
 export default function SettingsPage() {
   const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });
@@ -22,10 +23,10 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      const email = localStorage.getItem("userEmail") || "demo@nexuspay.com";
+      const email = localStorage.getItem("userEmail");
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getHeaders(),
         body: JSON.stringify({
           email,
           currentPassword: passwords.current,

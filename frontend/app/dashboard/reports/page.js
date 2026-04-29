@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { MdAssessment, MdTrendingUp, MdTrendingDown, MdBarChart, MdTimeline, MdFileDownload } from "react-icons/md";
+import { getHeaders } from "@/utils/api";
 
 export default function ReportsPage() {
   const [stats, setStats] = useState(null);
@@ -12,9 +13,8 @@ export default function ReportsPage() {
 
   const fetchStats = async () => {
     try {
-      const email = localStorage.getItem("userEmail") || "demo@nexuspay.com";
       const res = await fetch("/api/merchant/stats", {
-        headers: { "X-User-Email": email }
+        headers: getHeaders()
       });
       const data = await res.json();
       setStats(data);
@@ -22,6 +22,24 @@ export default function ReportsPage() {
       console.error("Error fetching stats:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownload = async (format) => {
+    try {
+      const res = await fetch(`/api/merchant/export/${format}`, {
+        headers: getHeaders()
+      });
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `transaction_report.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (error) {
+      console.error("Download failed:", error);
     }
   };
 
@@ -40,9 +58,20 @@ export default function ReportsPage() {
           <h1 className="text-4xl font-black text-[#02042b] tracking-tight">Business Intelligence</h1>
           <p className="text-slate-500 font-medium text-lg mt-1">Deep dive into your transaction data and growth.</p>
         </div>
-        <button className="px-6 py-4 bg-[#02042b] text-white font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2">
-            <MdFileDownload className="text-lg" /> Export Full Report
-        </button>
+        <div className="flex gap-4">
+          <button 
+            onClick={() => handleDownload("pdf")}
+            className="px-6 py-4 bg-[#02042b] text-white font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2"
+          >
+              <MdFileDownload className="text-lg" /> Download PDF
+          </button>
+          <button 
+            onClick={() => handleDownload("csv")}
+            className="px-6 py-4 bg-slate-100 text-[#02042b] font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center gap-2"
+          >
+              <MdFileDownload className="text-lg" /> Download CSV
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">

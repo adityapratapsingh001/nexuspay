@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin("*")
 public class PaymentController {
 
     private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
@@ -42,10 +44,20 @@ public class PaymentController {
         this.orderRepository = orderRepository;
     }
 
+    @Transactional(readOnly = true)
     @PostMapping("/generate-upi")
     public ResponseEntity<?> generateUPI(@RequestBody PaymentRequest request) {
         try {
-            String decrypted = encryptionService.decrypt(request.getQ());
+            String q = request.getQ();
+            if (q != null) q = q.trim();
+            
+            log.info("Generating UPI for Q: {}", q);
+            if (q == null || q.isEmpty()) {
+                return ResponseEntity.status(400).body(Map.of("error", "Missing payload"));
+            }
+
+            String decrypted = encryptionService.decrypt(q);
+            log.info("Decrypted Payload: {}", decrypted);
             Map<String, Object> data = objectMapper.readValue(decrypted, Map.class);
 
             String orderId = (String) data.get("oid");
@@ -54,6 +66,7 @@ public class PaymentController {
 
             Optional<Order> orderOpt = orderRepository.findByOrderId(orderId);
             if (orderOpt.isEmpty()) {
+                log.warn("Order not found: {}", orderId);
                 return ResponseEntity.status(404).body(Map.of("error", "Order not found"));
             }
 
@@ -70,11 +83,12 @@ public class PaymentController {
             response.put("mname", mname);
             response.put("order_id", orderId);
             response.put("timestamp", System.currentTimeMillis());
+            response.put("redirectUri", order.getReturnUrl());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("UPI Generation Error: ", e);
-            return ResponseEntity.status(400).body(Map.of("error", "Invalid data or server error"));
+            log.error("UPI Generation Error for Q: {}. Error: {}", request.getQ(), e.getMessage());
+            return ResponseEntity.status(400).body(Map.of("error", "Invalid data or server error: " + e.getMessage()));
         }
     }
 

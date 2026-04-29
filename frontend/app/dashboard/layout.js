@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { getHeaders } from "@/utils/api";
 import Sidebar from "@/components/Sidebar"; 
 import { MdMenu } from "react-icons/md";
 
@@ -7,12 +8,25 @@ export default function DashboardLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [data, setData] = useState(null);
   useEffect(() => {
-    const email = localStorage.getItem("userEmail");
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "/login";
+        return;
+    }
+
     fetch("/api/merchant/me", {
-      headers: { "X-User-Email": email || "" }
+      headers: getHeaders()
     })
       .then(res => res.json())
-      .then(setData);
+      .then(data => {
+          if (data.id && (!data.pan || data.pan === "")) {
+              window.location.href = "/onboarding";
+          }
+          setData(data);
+      })
+      .catch(() => {
+          window.location.href = "/login";
+      });
   }, []);
 
 

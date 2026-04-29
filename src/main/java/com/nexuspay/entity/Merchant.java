@@ -1,5 +1,6 @@
 package com.nexuspay.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -31,9 +32,16 @@ public class Merchant {
     private String apiSecret;
     private String status = "active";
 
+    @Column(name = "is_admin", nullable = false)
+    @JsonProperty("isAdmin")
+    private boolean isAdmin = false;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
     // Getters and Setters
+    public boolean isAdmin() { return isAdmin; }
+    public void setAdmin(boolean admin) { isAdmin = admin; }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

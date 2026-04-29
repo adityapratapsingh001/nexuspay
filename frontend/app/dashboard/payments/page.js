@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { MdSearch, MdHistory, MdFilterList, MdCheckCircle, MdTimer, MdFlashOn, MdLink } from "react-icons/md";
+import { getHeaders } from "@/utils/api";
 
 export default function PaymentsPage() {
   const [payments, setPayments] = useState([]);
@@ -15,8 +16,7 @@ export default function PaymentsPage() {
 
   const fetchData = async () => {
     try {
-      const email = localStorage.getItem("userEmail") || "demo@nexuspay.com";
-      const headers = { "X-User-Email": email };
+      const headers = getHeaders();
       
       const [paymentsRes, statsRes] = await Promise.all([
         fetch("/api/merchant/orders", { headers }),

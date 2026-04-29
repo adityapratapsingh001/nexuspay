@@ -67,7 +67,7 @@ export default function PayPage() {
       }
     } catch (err) {
       console.error(err);
-      setErrorMessage("Connection failed");
+      setErrorMessage("Connection failed: " + (err.message || "Unknown error"));
       setViewState("error");
     }
   };
@@ -198,7 +198,12 @@ export default function PayPage() {
         {/* RIGHT SIDE: PAYMENT METHODS & QR */}
         <div className="flex-1 bg-white p-8 md:p-10">
 
-          {viewState === "active" ? (
+          {viewState === "loading" ? (
+            <div className="h-full flex flex-col items-center justify-center text-center py-20">
+               <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+               <p className="text-slate-500 font-bold animate-pulse">Initializing Secure Checkout...</p>
+            </div>
+          ) : viewState === "active" ? (
             <div className="h-full flex flex-col">
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2">

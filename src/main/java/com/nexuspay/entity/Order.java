@@ -22,6 +22,7 @@ public class Order {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
     @Column(name = "payment_link", columnDefinition = "TEXT")
     private String paymentLink;
 

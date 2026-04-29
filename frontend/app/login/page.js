@@ -21,6 +21,7 @@ export default function LoginPage() {
             const data = await res.json();
             if (data.auth) {
                 localStorage.setItem("userEmail", email);
+                localStorage.setItem("token", data.token);
                 if (data.onboarded) {
                     window.location.href = "/dashboard";
                 } else {

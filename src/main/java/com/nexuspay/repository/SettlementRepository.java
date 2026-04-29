@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface SettlementRepository extends JpaRepository<Settlement, Long> {
     List<Settlement> findByMerchantOrderByProcessedAtDesc(Merchant merchant);
+    List<Settlement> findByMerchant(Merchant merchant);
 }

@@ -12,7 +12,8 @@ import {
   MdSettings,
   MdHelp,
   MdClose,
-  MdCode
+  MdCode,
+  MdTerminal
 } from "react-icons/md";
 
 
@@ -82,6 +83,11 @@ export default function Sidebar({ isOpen, setIsOpen, data }) {
               <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-500 hover:text-[#02042b] hover:bg-slate-50 transition-all">
                 <MdSettings className="text-xl text-slate-400" /> Settings
               </Link>
+              {data?.isAdmin && (
+                <Link href="/dashboard/admin/logs" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-blue-600 bg-blue-50/50 hover:bg-blue-50 transition-all mt-2">
+                  <MdTerminal className="text-xl text-blue-500" /> System Logs
+                </Link>
+              )}
             </div>
 
           </nav>

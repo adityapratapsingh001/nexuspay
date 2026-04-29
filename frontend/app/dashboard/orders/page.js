@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { MdSearch, MdReceipt, MdCheckCircle, MdTimer, MdInfo } from "react-icons/md";
+import { getHeaders } from "@/utils/api";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -13,9 +14,8 @@ export default function OrdersPage() {
 
   const fetchOrders = async () => {
     try {
-      const email = localStorage.getItem("userEmail") || "demo@nexuspay.com";
       const response = await fetch("/api/merchant/orders", {
-        headers: { "X-User-Email": email }
+        headers: getHeaders()
       });
       const data = await response.json();
       if (Array.isArray(data)) {

@@ -14,6 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByMerchantOrderByCreatedAtDesc(Merchant merchant);
     List<Order> findByMerchantAndStatus(Merchant merchant, OrderStatus status);
     List<Order> findByMerchantAndStatusAndPaidAtBetween(Merchant merchant, OrderStatus status, LocalDateTime start, LocalDateTime end);
+    List<Order> findByStatusAndCreatedAtBefore(OrderStatus status, LocalDateTime time);
 }
 
 

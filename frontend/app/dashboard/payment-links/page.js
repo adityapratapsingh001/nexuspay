@@ -3,6 +3,7 @@ import { useState } from "react";
 import Toast from "@/components/Toast";
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
+import { getHeaders } from "@/utils/api";
 import {
   MdAttachMoney,
   MdDescription,
@@ -37,20 +38,15 @@ export default function PaymentLinksPage() {
     setLink("");
 
     try {
-      const email = localStorage.getItem("userEmail");
       const res = await fetch("/api/merchant/create-link", {
         method: "POST",
-        headers: { 
-            "Content-Type": "application/json",
-            "X-User-Email": email || ""
-        },
+        headers: getHeaders(),
         body: JSON.stringify({ 
             amount: amt, 
             description: purpose,
             returnUrl: returnUrl,
             origin: window.location.origin
         }),
-
       });
 
 

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
+import { getHeaders } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import LogoutButton from "@/components/Logout";
 import {
@@ -18,6 +19,7 @@ import {
 export default function OnboardingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
 
   const [form, setForm] = useState({
     businessName: "",
@@ -57,14 +59,22 @@ export default function OnboardingPage() {
     setForm({ ...form, [name]: value });
   };
 
-  const [email, setEmail] = useState("");
-
   useEffect(() => {
-    fetch("/api/auth/me")
+    const token = localStorage.getItem("token");
+    if (!token) {
+        router.push("/login");
+        return;
+    }
+
+    fetch("/api/auth/me", {
+        headers: getHeaders()
+    })
       .then(res => res.json())
       .then(data => {
         if (data.email) setEmail(data.email);
-      });
+        else router.push("/login");
+      })
+      .catch(() => router.push("/login"));
   }, []);
 
   const handleSubmit = async (e) => {
@@ -79,7 +89,7 @@ export default function OnboardingPage() {
 
     const res = await fetch("/api/merchant/onboard", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getHeaders(),
       body: JSON.stringify(payload)
     });
 

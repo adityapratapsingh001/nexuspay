@@ -15,8 +15,12 @@ public class MerchantService {
     }
 
     public Merchant onboard(Merchant merchant) {
-        merchant.setApiKey("NEXUS_" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 24).toUpperCase());
-        merchant.setApiSecret("sk_live_" + java.util.UUID.randomUUID().toString().replace("-", ""));
+        if (merchant.getApiKey() == null || merchant.getApiKey().isEmpty()) {
+            merchant.setApiKey("NEXUS_" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 24).toUpperCase());
+        }
+        if (merchant.getApiSecret() == null || merchant.getApiSecret().isEmpty()) {
+            merchant.setApiSecret("sk_live_" + java.util.UUID.randomUUID().toString().replace("-", ""));
+        }
         return merchantRepository.save(merchant);
     }
 

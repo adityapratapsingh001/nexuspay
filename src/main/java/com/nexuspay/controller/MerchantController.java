@@ -9,7 +9,9 @@ import com.nexuspay.repository.OrderRepository;
 import com.nexuspay.repository.SettlementRepository;
 import com.nexuspay.service.EncryptionService;
 import com.nexuspay.service.MerchantService;
+import com.nexuspay.service.ReportService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,47 +27,69 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/merchant")
+@CrossOrigin("*")
 public class MerchantController {
 
     private final MerchantService merchantService;
     private final OrderRepository orderRepository;
     private final SettlementRepository settlementRepository;
+    private final ReportService reportService;
     private final EncryptionService encryptionService;
     private final ObjectMapper objectMapper;
 
     public MerchantController(MerchantService merchantService, 
                               OrderRepository orderRepository, 
                               SettlementRepository settlementRepository,
+                              ReportService reportService,
                               EncryptionService encryptionService,
                               ObjectMapper objectMapper) {
         this.merchantService = merchantService;
         this.orderRepository = orderRepository;
         this.settlementRepository = settlementRepository;
+        this.reportService = reportService;
         this.encryptionService = encryptionService;
         this.objectMapper = objectMapper;
     }
 
 
     @GetMapping("/settlements")
-    public ResponseEntity<?> getSettlements(@RequestHeader(value = "X-User-Email", required = false) String email) {
+    public ResponseEntity<?> getSettlements(HttpServletRequest request) {
         try {
-            if (email == null || email.isEmpty()) email = "demo@nexuspay.com";
+            String email = (String) request.getAttribute("authenticatedEmail");
+            if (email == null) return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
             Merchant merchant = merchantService.findByEmail(email).orElseThrow();
-            return ResponseEntity.ok(settlementRepository.findByMerchantOrderByProcessedAtDesc(merchant));
+            
+            List<Order> paidOrders = orderRepository.findByMerchantAndStatus(merchant, OrderStatus.PAID);
+            BigDecimal totalPaid = paidOrders.stream().map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            
+            List<Settlement> settlements = settlementRepository.findByMerchantOrderByProcessedAtDesc(merchant);
+            BigDecimal totalSettled = settlements.stream().map(Settlement::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            
+            BigDecimal availableBalance = totalPaid.subtract(totalSettled);
+
+            return ResponseEntity.ok(Map.of(
+                "settlements", settlements,
+                "availableBalance", availableBalance
+            ));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
 
     @PostMapping("/request-settlement")
-    public ResponseEntity<?> requestSettlement(@RequestHeader(value = "X-User-Email", required = false) String email) {
+    public ResponseEntity<?> requestSettlement(HttpServletRequest request) {
         try {
-            if (email == null || email.isEmpty()) email = "demo@nexuspay.com";
+            String email = (String) request.getAttribute("authenticatedEmail");
+            if (email == null) return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
             Merchant merchant = merchantService.findByEmail(email).orElseThrow();
             
-            // Calculate balance (Mock: all PAID orders not already settled)
             List<Order> paidOrders = orderRepository.findByMerchantAndStatus(merchant, OrderStatus.PAID);
-            BigDecimal totalAmount = paidOrders.stream().map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalPaid = paidOrders.stream().map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            
+            List<Settlement> settlements = settlementRepository.findByMerchant(merchant);
+            BigDecimal totalSettled = settlements.stream().map(Settlement::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            
+            BigDecimal totalAmount = totalPaid.subtract(totalSettled);
             
             if (totalAmount.compareTo(BigDecimal.ZERO) <= 0) {
                 return ResponseEntity.status(400).body(Map.of("error", "Insufficient balance for settlement"));
@@ -100,8 +124,7 @@ public class MerchantController {
         try {
             String email = request.get("email");
             if (email == null || email.isEmpty()) {
-                // For demo/simplicity if no email, use demo
-                email = "demo@nexuspay.com";
+                return ResponseEntity.status(400).body(Map.of("error", "Email is required"));
             }
 
             Optional<Merchant> merchantOpt = merchantService.findByEmail(email);
@@ -139,33 +162,36 @@ public class MerchantController {
 
 
     @GetMapping("/me")
-    public ResponseEntity<?> getMe(@RequestHeader(value = "X-User-Email", required = false) String email) {
-        if (email == null || email.isEmpty()) email = "demo@nexuspay.com";
+    public ResponseEntity<?> getMe(HttpServletRequest request) {
+        String email = (String) request.getAttribute("authenticatedEmail");
+        if (email == null) return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
         
         Optional<Merchant> merchantOpt = merchantService.findByEmail(email);
         if (merchantOpt.isPresent()) {
             return ResponseEntity.ok(merchantOpt.get());
         }
-        return ResponseEntity.ok(Map.of("error", "Merchant not found for " + email));
+        return ResponseEntity.status(404).body(Map.of("error", "Merchant not found"));
     }
 
     @PostMapping("/roll-keys")
-    public ResponseEntity<?> rollKeys(@RequestHeader(value = "X-User-Email", required = false) String email) {
-        if (email == null || email.isEmpty()) email = "demo@nexuspay.com";
+    public ResponseEntity<?> rollKeys(HttpServletRequest request) {
+        String email = (String) request.getAttribute("authenticatedEmail");
+        if (email == null) return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
 
         Optional<Merchant> merchantOpt = merchantService.findByEmail(email);
         if (merchantOpt.isPresent()) {
             Merchant rolled = merchantService.rollKeys(merchantOpt.get());
             return ResponseEntity.ok(Map.of("apiKey", rolled.getApiKey(), "apiSecret", rolled.getApiSecret()));
         }
-        return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        return ResponseEntity.status(404).body(Map.of("error", "Merchant not found"));
     }
 
 
     @PostMapping("/create-link")
-    public ResponseEntity<?> createLink(@RequestBody Map<String, Object> request, @RequestHeader(value = "X-User-Email", required = false) String email) {
+    public ResponseEntity<?> createLink(@RequestBody Map<String, Object> request, HttpServletRequest httpRequest) {
         try {
-            if (email == null || email.isEmpty()) email = "demo@nexuspay.com";
+            String email = (String) httpRequest.getAttribute("authenticatedEmail");
+            if (email == null) return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
             Merchant merchant = merchantService.findByEmail(email).orElseThrow();
 
 
@@ -184,6 +210,7 @@ public class MerchantController {
 
             String encrypted = encryptionService.encrypt(objectMapper.writeValueAsString(payload));
             String origin = request.get("origin") != null ? request.get("origin").toString() : "http://localhost:8080";
+            if (origin.endsWith("/")) origin = origin.substring(0, origin.length() - 1);
             String paymentUrl = origin + "/pay?q=" + encrypted;
 
             Order order = new Order();
@@ -208,9 +235,10 @@ public class MerchantController {
     }
 
     @GetMapping("/orders")
-    public ResponseEntity<?> getOrders(@RequestHeader(value = "X-User-Email", required = false) String email) {
+    public ResponseEntity<?> getOrders(HttpServletRequest request) {
         try {
-            if (email == null || email.isEmpty()) email = "demo@nexuspay.com";
+            String email = (String) request.getAttribute("authenticatedEmail");
+            if (email == null) return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
             Merchant merchant = merchantService.findByEmail(email).orElseThrow();
             List<Order> orders = orderRepository.findByMerchantOrderByCreatedAtDesc(merchant);
             return ResponseEntity.ok(orders);
@@ -220,9 +248,10 @@ public class MerchantController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<?> getStats(@RequestHeader(value = "X-User-Email", required = false) String email) {
+    public ResponseEntity<?> getStats(HttpServletRequest request) {
         try {
-            if (email == null || email.isEmpty()) email = "demo@nexuspay.com";
+            String email = (String) request.getAttribute("authenticatedEmail");
+            if (email == null) return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
             Merchant merchant = merchantService.findByEmail(email).orElseThrow();
             
             LocalDateTime startOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
@@ -249,8 +278,61 @@ public class MerchantController {
                 "totalToday", totalToday,
                 "countToday", todayOrders.size(),
                 "totalRevenue", totalRevenue,
-                "totalOrders", allOrders.size()
+                "totalOrders", paidOrders.size()
             ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+    @GetMapping("/export/pdf")
+    public ResponseEntity<byte[]> exportPdf(HttpServletRequest request) throws java.io.IOException {
+        String email = (String) request.getAttribute("authenticatedEmail");
+        if (email == null) return ResponseEntity.status(401).build();
+        Merchant merchant = merchantService.findByEmail(email).orElseThrow();
+        List<Order> orders = orderRepository.findByMerchantOrderByCreatedAtDesc(merchant);
+
+        byte[] pdf = reportService.generateOrdersPdf(merchant, orders);
+
+        return ResponseEntity.ok()
+            .header("Content-Type", "application/pdf")
+            .header("Content-Disposition", "attachment; filename=report.pdf")
+            .body(pdf);
+    }
+
+    @GetMapping("/export/csv")
+    public ResponseEntity<String> exportCsv(HttpServletRequest request) {
+        String email = (String) request.getAttribute("authenticatedEmail");
+        if (email == null) return ResponseEntity.status(401).build();
+        Merchant merchant = merchantService.findByEmail(email).orElseThrow();
+        List<Order> orders = orderRepository.findByMerchantOrderByCreatedAtDesc(merchant);
+
+        String csv = reportService.generateOrdersCsv(orders);
+
+        return ResponseEntity.ok()
+            .header("Content-Type", "text/csv")
+            .header("Content-Disposition", "attachment; filename=report.csv")
+            .body(csv);
+    }
+
+    @GetMapping("/admin/logs")
+    public ResponseEntity<?> getLogs(HttpServletRequest request) {
+        try {
+            String email = (String) request.getAttribute("authenticatedEmail");
+            if (email == null) return ResponseEntity.status(401).build();
+            
+            Merchant merchant = merchantService.findByEmail(email).orElseThrow();
+            if (!merchant.isAdmin()) {
+                return ResponseEntity.status(403).body(Map.of("error", "Forbidden: Admin access required"));
+            }
+
+            java.nio.file.Path path = java.nio.file.Paths.get("logs.txt");
+            if (!java.nio.file.Files.exists(path)) {
+                return ResponseEntity.ok(java.util.List.of("No logs found yet."));
+            }
+
+            java.util.List<String> logs = java.nio.file.Files.readAllLines(path);
+            int start = Math.max(0, logs.size() - 100);
+            return ResponseEntity.ok(logs.subList(start, logs.size()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }

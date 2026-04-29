@@ -22,8 +22,10 @@ export default function SignupPage() {
                 body: JSON.stringify(formData),
             });
             const data = await res.json();
-            if (data.auth) {
-                window.location.href = "/login";
+            if (data.auth && data.token) {
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("userEmail", formData.email);
+                window.location.href = "/onboarding";
             } else {
                 setError(data.error || "Failed to register");
             }

@@ -1,0 +1,20 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/dashboard/admin/logs/page": "/dashboard/admin/logs",
+  "/dashboard/docs/page": "/dashboard/docs",
+  "/dashboard/orders/page": "/dashboard/orders",
+  "/dashboard/page": "/dashboard",
+  "/dashboard/payment-links/page": "/dashboard/payment-links",
+  "/dashboard/payments/page": "/dashboard/payments",
+  "/dashboard/reports/page": "/dashboard/reports",
+  "/dashboard/settings/page": "/dashboard/settings",
+  "/dashboard/settlements/page": "/dashboard/settlements",
+  "/login/page": "/login",
+  "/onboarding/page": "/onboarding",
+  "/page": "/",
+  "/pay/page": "/pay",
+  "/payment/failure/page": "/payment/failure",
+  "/payment/success/page": "/payment/success",
+  "/signup/page": "/signup"
+}

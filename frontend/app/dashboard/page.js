@@ -4,6 +4,7 @@ import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
+import { getHeaders } from "@/utils/api";
 import {
   MdContentCopy,
   MdQrCode,
@@ -28,8 +29,7 @@ export default function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const email = localStorage.getItem("userEmail") || "demo@nexuspay.com";
-    const headers = { "X-User-Email": email };
+    const headers = getHeaders();
     
     // Fetch Profile
     fetch("/api/merchant/me", { headers })
@@ -57,11 +57,10 @@ export default function DashboardPage() {
 
   const confirmRollKeys = async () => {
     setIsRolling(true);
-    const email = localStorage.getItem("userEmail");
     try {
       const res = await fetch("/api/merchant/roll-keys", { 
           method: "POST",
-          headers: { "X-User-Email": email || "" }
+          headers: getHeaders()
       });
 
       const json = await res.json();
