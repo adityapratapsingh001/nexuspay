@@ -1,29 +1,44 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
 });
 
 export const metadata = {
-  title: "NexusPay",
-  description: "Next Generation Payment Gatweay",
+  title: "NexusPay | Modern Payment Infrastructure for India",
+  description: "Experience the next generation of digital payments. Zero transaction fees, bank-grade security, and developer-first SDKs.",
+  keywords: "payment gateway, india, upi, zero fee, nexuspay, fintech",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-    <head>
-    <link rel="shortcut icon" href="/icon.png" type="image/x-icon" />
-    </head>
+    <html lang="en" className="scroll-smooth">
+      <head>
+        <link rel="shortcut icon" href="/logo.png" type="image/x-icon" />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              const theme = localStorage.getItem('theme');
+              if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+              } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+              } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+              }
+            })();
+          `
+        }} />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${outfit.variable} antialiased font-sans`}
       >
         {children}
       </body>

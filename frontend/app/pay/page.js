@@ -106,7 +106,6 @@ export default function PayPage() {
           
           let finalRedirect = result.returnUrl || redirectURI || "";
           if (finalRedirect) {
-              // Ensure the URL ends with /payment/redirect if it's just a domain or base path
               let baseUrl = finalRedirect.split('?')[0].replace(/\/$/, "");
               if (!baseUrl.endsWith("/payment/redirect")) {
                   baseUrl += "/payment/redirect";
@@ -141,10 +140,10 @@ export default function PayPage() {
       </div>
 
       {/* MAIN CHECKOUT CONTAINER */}
-      <div className="relative w-full max-w-4xl bg-white rounded-[2rem] shadow-2xl shadow-blue-900/10 flex flex-col md:flex-row overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-700">
+      <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl shadow-blue-900/10 flex flex-col md:flex-row overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-700">
 
-        {/* LEFT SIDE: MERCHANT & INFO (Brand Section) */}
-        <div className="w-full md:w-[360px] bg-[#02042b] p-8 md:p-10 text-white flex flex-col relative overflow-hidden">
+        {/* LEFT SIDE: MERCHANT & INFO */}
+        <div className="w-full md:w-[360px] bg-[#02042B] p-8 md:p-10 text-white flex flex-col relative overflow-hidden">
           {/* Brand Pattern */}
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute inset-0 bg-[radial-gradient(#3395FF_1px,transparent_1px)] bg-[size:20px_20px]" />
@@ -177,7 +176,7 @@ export default function PayPage() {
 
                 <div className="pt-8 space-y-4">
                   <div className="flex items-center gap-3 text-slate-400 text-xs font-bold uppercase tracking-widest">
-                    <MdShield className="text-green-500 text-lg" />
+                    <MdShield className="text-blue-500 text-lg" />
                     <span>Secure 256-bit SSL</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-400 text-xs font-bold uppercase tracking-widest">
@@ -200,7 +199,7 @@ export default function PayPage() {
 
           {viewState === "loading" ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-20">
-               <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+               <div className="w-16 h-16 border-4 border-[#02042B] border-t-transparent rounded-full animate-spin mb-6"></div>
                <p className="text-slate-500 font-bold animate-pulse">Initializing Secure Checkout...</p>
             </div>
           ) : viewState === "active" ? (
@@ -208,7 +207,7 @@ export default function PayPage() {
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2">
                   <img src="/logo.png" className="w-6 h-6 object-contain" alt="Nexus" />
-                  <h3 className="text-sm font-black uppercase tracking-wider text-[#02042b]">Checkout</h3>
+                  <h3 className="text-sm font-black uppercase tracking-wider text-[#02042B]">Checkout</h3>
                 </div>
 
                 <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full border border-orange-100">
@@ -217,15 +216,17 @@ export default function PayPage() {
                     {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
                   </span>
                 </div>
-              </div>                    <div className="grid grid-cols-1 gap-6">
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
 
                 {/* QR CODE CARD */}
-                <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 flex flex-col items-center">
+                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col items-center">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Scan with any UPI app</p>
 
-                  <div className="bg-white p-4 rounded-[2rem] shadow-xl shadow-blue-500/5 mb-6 border border-slate-50 relative group">
+                  <div className="bg-white p-4 rounded-2xl shadow-xl shadow-blue-500/5 mb-6 border border-slate-50 relative group">
                     <img src={qrSrc} alt="UPI QR" className="w-48 h-48 object-contain" />
-                    <div className="absolute inset-0 border-2 border-blue-500/5 rounded-[2rem] group-hover:border-blue-500/20 transition-all pointer-events-none" />
+                    <div className="absolute inset-0 border-2 border-blue-500/5 rounded-2xl group-hover:border-[#02042B]/20 transition-all pointer-events-none" />
                   </div>
 
                   <div className="flex items-center gap-6 saturate-[0.8] hover:saturate-100 transition-all duration-500">
@@ -251,12 +252,12 @@ export default function PayPage() {
             </div>
           ) : viewState === "paid_already" ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-20">
-              <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center text-green-500 text-6xl mb-8 animate-in zoom-in-50 duration-500">
+              <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 text-6xl mb-8 animate-in zoom-in-50 duration-500">
                 <MdCheckCircle />
               </div>
               <h2 className="text-3xl font-black mb-4">Payment Received</h2>
               <p className="text-slate-500 font-medium max-w-xs mx-auto mb-10">This order has already been paid for. You can close this window now.</p>
-              <button onClick={() => window.close()} className="px-10 py-4 bg-[#02042b] text-white font-black rounded-xl hover:scale-105 transition-all uppercase text-xs tracking-widest">
+              <button onClick={() => window.close()} className="px-10 py-4 bg-[#02042B] text-white font-black rounded-xl hover:scale-105 transition-all uppercase text-xs tracking-widest">
                 Close Window
               </button>
             </div>
@@ -267,7 +268,7 @@ export default function PayPage() {
               </div>
               <h2 className="text-3xl font-black mb-4">Payment Failed</h2>
               <p className="text-slate-500 font-medium max-w-xs mx-auto mb-10">{errorMessage || "The link is invalid or has expired. Please request a new link."}</p>
-              <a href="/" className="px-10 py-4 bg-[#02042b] text-white font-black rounded-xl hover:scale-105 transition-all uppercase text-xs tracking-widest">
+              <a href="/" className="px-10 py-4 bg-[#02042B] text-white font-black rounded-xl hover:scale-105 transition-all uppercase text-xs tracking-widest">
                 Back to Home
               </a>
             </div>

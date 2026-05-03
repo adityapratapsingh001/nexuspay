@@ -1,42 +1,85 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #3395FF; /* Razorpay Blue */
-  --color-secondary: #02042b;
-  --color-accent: #528FF0;
-  --color-background: #f5f7fa;
-  --color-card: #ffffff;
-  --color-text-main: #1c1c1c;
-  --color-text-muted: #5d6675;
+  --color-primary: #02042B;
+  /* Deep Navy - Requested specific color */
+  --color-primary-dark: #01021a;
+  --color-secondary: #1f2937;
+  /* Gray 800 */
+  --color-accent: #3395FF;
+  /* Vibrant Blue for secondary accents */
+  --color-highlight: #529CFF;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Inter', sans-serif;
 }
 
-body {
-  @apply bg-[var(--color-background)] text-[var(--color-text-main)] font-sans antialiased;
+@layer base {
+  :root {
+    --background: #f9fafb;
+    --foreground: #111827;
+    --card: #ffffff;
+    --card-border: #e5e7eb;
+    --muted: #6b7280;
+    --border: #f3f4f6;
+  }
+
+  body {
+    @apply bg-[var(--background)] text-[var(--foreground)] font-sans antialiased selection:bg-blue-500/10 transition-colors duration-200;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading font-semibold tracking-tight text-gray-900;
+  }
 }
 
-.razor-card {
-  @apply bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow;
-}
+@layer components {
+  .premium-card {
+    @apply bg-[var(--card)] rounded-xl border border-[var(--card-border)] shadow-sm transition-all duration-200;
+  }
 
-.razor-button {
-  @apply bg-[var(--color-primary)] text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
-}
+  .btn-primary {
+    @apply px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:opacity-90 transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-2 text-sm;
+  }
 
-.razor-input {
-  @apply w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] outline-none transition-all bg-white text-[var(--color-text-main)];
+  .btn-secondary {
+    @apply px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-sm;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all;
+  }
+
+  .sidebar-link-active {
+    @apply bg-blue-50 text-primary hover:bg-blue-50 hover:text-primary;
+  }
+
+  .badge-status {
+    @apply px-2.5 py-1 rounded-full text-[11px] font-semibold border;
+  }
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 5px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  @apply bg-gray-200 rounded-full;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  @apply bg-gray-300;
 }

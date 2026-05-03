@@ -100,7 +100,7 @@
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "/Users/ayushshukla/Documents/nexus/frontend",
+    "outputFileTracingRoot": "/Users/ayushshukla/Documents/nexuspay/frontend",
     "cacheComponents": false,
     "cacheLife": {
       "default": {
@@ -290,7 +290,7 @@
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.mjs",
     "turbopack": {
-      "root": "/Users/ayushshukla/Documents/nexus/frontend"
+      "root": "/Users/ayushshukla/Documents/nexuspay/frontend"
     },
     "distDirRoot": ".next",
     "_originalRewrites": {
@@ -304,7 +304,7 @@
       "fallback": []
     }
   },
-  "appDir": "/Users/ayushshukla/Documents/nexus/frontend",
+  "appDir": "/Users/ayushshukla/Documents/nexuspay/frontend",
   "relativeAppDir": "",
   "files": [
     ".next/routes-manifest.json",

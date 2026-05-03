@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { MdAssessment, MdTrendingUp, MdTrendingDown, MdBarChart, MdTimeline, MdFileDownload } from "react-icons/md";
+import { MdAssessment, MdTrendingUp, MdBarChart, MdTimeline, MdFileDownload, MdPieChart } from "react-icons/md";
 import { getHeaders } from "@/utils/api";
 
 export default function ReportsPage() {
@@ -34,7 +34,7 @@ export default function ReportsPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `transaction_report.${format}`;
+      a.download = `nexus_report.${format}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -43,115 +43,109 @@ export default function ReportsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="h-64 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-blue-500/10 border-t-blue-500 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="flex-1 flex flex-col items-center justify-center bg-gray-50/30">
+        <div className="w-8 h-8 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+        <p className="mt-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Compiling Analytics...</p>
+    </div>
+  );
 
   return (
-    <div className="p-8 md:p-12 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+    <div className="flex-1 min-h-screen bg-gray-50/30 p-6 md:p-10 transition-all duration-300">
+      
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-10">
         <div>
-          <h1 className="text-4xl font-black text-[#02042b] tracking-tight">Business Intelligence</h1>
-          <p className="text-slate-500 font-medium text-lg mt-1">Deep dive into your transaction data and growth.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
+          <p className="text-sm text-gray-500 mt-1">Comprehensive analysis of your business growth.</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-3">
           <button 
             onClick={() => handleDownload("pdf")}
-            className="px-6 py-4 bg-[#02042b] text-white font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2"
+            className="btn-secondary py-2 px-4 text-xs uppercase tracking-widest"
           >
-              <MdFileDownload className="text-lg" /> Download PDF
+              <MdFileDownload className="text-lg" /> PDF
           </button>
           <button 
             onClick={() => handleDownload("csv")}
-            className="px-6 py-4 bg-slate-100 text-[#02042b] font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center gap-2"
+            className="btn-primary py-2 px-4 text-xs uppercase tracking-widest"
           >
-              <MdFileDownload className="text-lg" /> Download CSV
+              <MdFileDownload className="text-lg" /> CSV
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-                  <MdTrendingUp className="text-6xl text-green-500" />
-              </div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 text-transparent bg-clip-text bg-gradient-to-r from-slate-400 to-slate-300">Net Revenue</p>
-              <h3 className="text-4xl font-black text-[#02042b] mb-2">₹{stats?.totalRevenue?.toLocaleString()}</h3>
-              <div className="flex items-center gap-2 text-green-500 text-xs font-bold">
-                  <span className="px-2 py-0.5 bg-green-50 rounded-full">+12.5%</span>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="premium-card p-8">
+              <MdTrendingUp className="text-3xl text-blue-500 mb-6" />
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Revenue</p>
+              <h3 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">₹{stats?.totalRevenue?.toLocaleString()}</h3>
+              <div className="flex items-center gap-2 text-primary text-[10px] font-bold uppercase">
+                  <span className="px-2 py-0.5 bg-blue-50 rounded">+12.5%</span>
                   <span>vs last month</span>
               </div>
           </div>
 
-          <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform text-[#3395FF]">
-                  <MdBarChart className="text-6xl" />
-              </div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Successful Orders</p>
-              <h3 className="text-4xl font-black text-[#02042b] mb-2">{stats?.totalOrders}</h3>
-              <div className="flex items-center gap-2 text-[#3395FF] text-xs font-bold">
-                  <span className="px-2 py-0.5 bg-blue-50 rounded-full">+8%</span>
+          <div className="premium-card p-8">
+              <MdBarChart className="text-3xl text-blue-500 mb-6" />
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Transactions</p>
+              <h3 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">{stats?.totalOrders?.toLocaleString()}</h3>
+              <div className="flex items-center gap-2 text-blue-600 text-[10px] font-bold uppercase">
+                  <span className="px-2 py-0.5 bg-blue-50 rounded">+8%</span>
                   <span>vs last month</span>
               </div>
           </div>
 
-          <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform text-orange-500">
-                  <MdTimeline className="text-6xl" />
-              </div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Avg. Ticket Size</p>
-              <h3 className="text-4xl font-black text-[#02042b] mb-2">₹{(stats?.totalRevenue / (stats?.totalOrders || 1)).toFixed(2)}</h3>
-              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Growth Phase</p>
+          <div className="premium-card p-8">
+              <MdPieChart className="text-3xl text-orange-500 mb-6" />
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Avg. Ticket Size</p>
+              <h3 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">₹{(stats?.totalRevenue / (stats?.totalOrders || 1)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</h3>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Consistent performance</p>
           </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm">
-              <h3 className="font-black text-[#02042b] uppercase tracking-widest text-sm mb-10 flex items-center gap-3">
-                  <div className="w-1.5 h-6 bg-[#3395FF] rounded-full"></div> Revenue Breakdown
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div className="premium-card p-8">
+              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-8 flex items-center gap-2">
+                  <div className="w-1 h-4 bg-blue-500 rounded-full"></div> Revenue Sources
               </h3>
               <div className="space-y-8">
                   {[
-                      { label: "Direct Payments", value: 75, color: "#3395FF" },
-                      { label: "Payment Links", value: 20, color: "#02042b" },
-                      { label: "Subscriptions", value: 5, color: "#cbd5e1" }
+                      { label: "Direct Checkout", value: 72, color: "bg-blue-500" },
+                      { label: "Payment Links", value: 22, color: "bg-gray-800" },
+                      { label: "Smart Collect", value: 6, color: "bg-gray-200" }
                   ].map((item, i) => (
                       <div key={i}>
-                          <div className="flex justify-between items-end mb-3">
-                              <span className="text-sm font-black text-slate-500 uppercase tracking-widest">{item.label}</span>
-                              <span className="text-lg font-black text-[#02042b]">{item.value}%</span>
+                          <div className="flex justify-between items-end mb-2">
+                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{item.label}</span>
+                              <span className="text-sm font-bold text-gray-900">{item.value}%</span>
                           </div>
-                          <div className="h-4 w-full bg-slate-50 rounded-full overflow-hidden flex">
-                              <div className="h-full transition-all duration-1000" style={{ width: `${item.value}%`, backgroundColor: item.color }}></div>
+                          <div className="h-2 w-full bg-gray-50 rounded-full overflow-hidden">
+                              <div className={`h-full transition-all duration-1000 ${item.color}`} style={{ width: `${item.value}%` }}></div>
                           </div>
                       </div>
                   ))}
               </div>
           </div>
 
-          <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm">
-              <h3 className="font-black text-[#02042b] uppercase tracking-widest text-sm mb-10 flex items-center gap-3">
-                  <div className="w-1.5 h-6 bg-green-500 rounded-full"></div> Conversion Funnel
+          <div className="premium-card p-8">
+              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-8 flex items-center gap-2">
+                  <div className="w-1 h-4 bg-blue-500 rounded-full"></div> Conversion Funnel
               </h3>
               <div className="space-y-6">
                   {[
-                      { label: "Visits", value: "1,240", sub: "100%", w: "100%" },
-                      { label: "Initiated", value: "842", sub: "68%", w: "68%" },
-                      { label: "Successful", value: "612", sub: "49%", w: "49%" }
+                      { label: "Total Visits", value: "2.4k", p: "100%", w: "100%", color: "bg-blue-500" },
+                      { label: "Started Payment", value: "1.8k", p: "75%", w: "75%", color: "bg-blue-500" },
+                      { label: "Completed", value: "1.2k", p: "50%", w: "50%", color: "bg-blue-500" }
                   ].map((item, i) => (
                       <div key={i} className="flex items-center gap-6">
-                          <div className="w-32">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.label}</p>
-                              <p className="text-xl font-black text-[#02042b]">{item.value}</p>
+                          <div className="w-28 shrink-0">
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{item.label}</p>
+                              <p className="text-lg font-bold text-gray-900">{item.value}</p>
                           </div>
-                          <div className="flex-1 h-12 bg-slate-50 rounded-2xl relative overflow-hidden">
-                              <div className="absolute inset-y-0 left-0 bg-green-500/10 border-r-2 border-green-500 transition-all duration-1000" style={{ width: item.w }}></div>
-                              <div className="absolute inset-0 flex items-center px-4 font-black text-green-600 text-xs">
-                                  {item.sub}
+                          <div className="flex-1 h-10 bg-gray-50 rounded-lg relative overflow-hidden border border-gray-100">
+                              <div className={`absolute inset-y-0 left-0 ${item.color} opacity-10 border-r-2 border-blue-500 transition-all duration-1000`} style={{ width: item.w }}></div>
+                              <div className="absolute inset-0 flex items-center px-4 font-bold text-blue-600 text-[10px]">
+                                  {item.p}
                               </div>
                           </div>
                       </div>

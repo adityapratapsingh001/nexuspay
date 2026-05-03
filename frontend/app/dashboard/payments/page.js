@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { MdSearch, MdHistory, MdFilterList, MdCheckCircle, MdTimer, MdFlashOn, MdLink } from "react-icons/md";
+import { MdSearch, MdFilterList, MdCheckCircle, MdTimer, MdFlashOn, MdLink, MdFileDownload, MdHistory, MdOutlineFilterList } from "react-icons/md";
 import { getHeaders } from "@/utils/api";
 
 export default function PaymentsPage() {
@@ -38,7 +38,6 @@ export default function PaymentsPage() {
   const getFilteredPayments = () => {
     let filtered = payments.filter(p => p.status === "PAID");
     
-    // Filter by Search
     if (searchTerm) {
         filtered = filtered.filter(p => 
             p.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -46,7 +45,6 @@ export default function PaymentsPage() {
         );
     }
 
-    // Filter by Time
     const now = new Date();
     if (filter === "week") {
         const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -61,10 +59,8 @@ export default function PaymentsPage() {
 
   const filteredPayments = getFilteredPayments();
 
-
   const exportToCSV = () => {
     if (filteredPayments.length === 0) return;
-    
     const headers = ["Order ID", "Date", "Amount", "Description", "Source", "Status"];
     const rows = filteredPayments.map(p => [
         p.orderId,
@@ -74,114 +70,112 @@ export default function PaymentsPage() {
         p.source,
         p.status
     ]);
-
     const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", `nexus_payments_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
+    link.setAttribute("download", `payments_report.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   return (
-    <div className="p-8 md:p-12 animate-in fade-in duration-700">
+    <div className="flex-1 min-h-screen bg-gray-50/30 p-6 md:p-10 transition-all duration-300">
       
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-10">
         <div>
-          <h1 className="text-4xl font-black text-[#02042b] tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#02042b] to-slate-500">Payments</h1>
-          <p className="text-slate-500 font-medium text-lg mt-1">Monitor your successful revenue streams.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage and track your successful transactions.</p>
         </div>
 
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-wrap items-center gap-3">
             <button 
                 onClick={exportToCSV}
-                className="px-6 py-4 bg-white border border-slate-200 text-[#02042b] font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center gap-2"
+                className="btn-secondary py-2 px-4"
             >
-                Download CSV
+                <MdFileDownload className="text-lg" /> Export
             </button>
-            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-6">
-
-                <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 text-2xl">
-                    ₹
-                </div>
-                <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Today's Collection</p>
-                    <h3 className="text-2xl font-black text-[#02042b]">₹{stats.totalToday}</h3>
-                </div>
+            <div className="premium-card py-2 px-4 flex items-center gap-4">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Today</p>
+                <h3 className="text-lg font-bold text-gray-900">₹{stats.totalToday.toLocaleString()}</h3>
             </div>
         </div>
       </div>
 
-      {/* Filters & Search */}
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
-        <div className="relative flex-1 group">
-          <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl group-focus-within:text-blue-500 transition-colors" />
+      {/* Toolbar */}
+      <div className="flex flex-col lg:flex-row gap-4 mb-8">
+        <div className="relative flex-1">
+          <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
           <input 
             type="text" 
             placeholder="Search by ID or Description..."
-            className="pl-12 pr-6 py-4 bg-white border border-slate-100 rounded-2xl w-full shadow-sm focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all font-medium"
+            className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        <div className="flex gap-2 p-1.5 bg-slate-100 rounded-2xl">
+        <div className="flex p-1 bg-gray-100 rounded-lg border border-gray-200">
             {["all", "week", "month"].map((f) => (
                 <button
                     key={f}
                     onClick={() => setFilter(f)}
-                    className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === f ? 'bg-white text-[#02042b] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all ${filter === f ? 'bg-white text-primary shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                 >
-                    {f === "all" ? "All Time" : f === "week" ? "Last Week" : "Last Month"}
+                    {f === "all" ? "All Time" : f === "week" ? "Week" : "Month"}
                 </button>
             ))}
         </div>
       </div>
 
       {loading ? (
-        <div className="h-64 flex items-center justify-center">
-          <div className="w-12 h-12 border-4 border-blue-500/10 border-t-blue-500 rounded-full animate-spin"></div>
+        <div className="h-64 flex flex-col items-center justify-center gap-3">
+          <div className="w-8 h-8 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Loading Payments...</p>
         </div>
       ) : filteredPayments.length > 0 ? (
-        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+        <div className="premium-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Order ID</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Paid At</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Amount</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Description</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Receipt</th>
+                <tr className="bg-gray-50 border-b border-gray-100">
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Source</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Order ID</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Amount</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Description</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Receipt</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-gray-50">
                 {filteredPayments.map((p) => (
-                  <tr key={p.orderId} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-8 py-6">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${p.source === 'API' ? 'bg-indigo-50 text-indigo-500' : 'bg-blue-50 text-blue-500'}`} title={p.source}>
+                  <tr key={p.orderId} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-5">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg ${p.source === 'API' ? 'bg-blue-50 text-primary' : 'bg-blue-50 text-blue-600'}`}>
                             {p.source === 'API' ? <MdFlashOn /> : <MdLink />}
                         </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <span className="font-mono text-xs font-bold text-slate-500">{p.orderId}</span>
+                    <td className="px-6 py-5">
+                      <span className="font-mono text-[11px] font-medium text-gray-500 uppercase">{p.orderId}</span>
                     </td>
-                    <td className="px-8 py-6 text-sm font-bold text-slate-600">
-                      {new Date(p.paidAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    <td className="px-6 py-5">
+                        <p className="text-xs font-semibold text-gray-900 leading-none mb-1">
+                            {new Date(p.paidAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-medium uppercase">
+                            {new Date(p.paidAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
                     </td>
-                    <td className="px-8 py-6 text-lg font-black text-green-600">
-                      ₹{p.amount}
+                    <td className="px-6 py-5 text-right">
+                        <span className="text-sm font-bold text-gray-900">₹{p.amount.toLocaleString()}</span>
                     </td>
-                    <td className="px-8 py-6 text-sm font-medium text-slate-400">
+                    <td className="px-6 py-5 text-xs font-medium text-gray-400 truncate max-w-[150px]">
                       {p.description || "—"}
                     </td>
-                    <td className="px-8 py-6 text-right">
-                        <button className="text-blue-500 hover:text-blue-700 text-xs font-black uppercase tracking-widest">View</button>
+                    <td className="px-6 py-5 text-right">
+                        <button className="text-primary hover:text-blue-700 text-[10px] font-bold uppercase tracking-widest">Details</button>
                     </td>
                   </tr>
                 ))}
@@ -190,13 +184,14 @@ export default function PaymentsPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white p-20 rounded-[3rem] border border-slate-100 flex flex-col items-center justify-center text-center shadow-xl shadow-slate-200/50">
-          <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center text-5xl mb-6 grayscale opacity-50">💳</div>
-          <h3 className="text-2xl font-black text-[#02042b]">No successful payments</h3>
-          <p className="text-slate-400 max-w-xs mx-auto mt-2 font-medium">Try changing your filters or checking the Orders tab for pending requests.</p>
+        <div className="premium-card p-20 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-200 text-3xl mb-4">
+            <MdHistory />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900">No transactions found</h3>
+          <p className="text-gray-400 text-sm mt-1 max-w-xs mx-auto">Try adjusting your filters or checking back later.</p>
         </div>
       )}
     </div>
   );
 }
-

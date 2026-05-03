@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-
 import { getHeaders } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import LogoutButton from "@/components/Logout";
@@ -13,13 +12,17 @@ import {
   MdPhone,
   MdAccountBalance,
   MdNumbers,
-  MdPerson
+  MdPerson,
+  MdSecurity,
+  MdArrowForward,
+  MdVerifiedUser
 } from "react-icons/md";
 
 export default function OnboardingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [activeStep, setActiveStep] = useState(1);
 
   const [form, setForm] = useState({
     businessName: "",
@@ -87,182 +90,224 @@ export default function OnboardingPage() {
       aadhar: form.aadhar.replace(/\s/g, "")
     };
 
-    const res = await fetch("/api/merchant/onboard", {
-      method: "POST",
-      headers: getHeaders(),
-      body: JSON.stringify(payload)
-    });
+    try {
+        const res = await fetch("/api/merchant/onboard", {
+            method: "POST",
+            headers: getHeaders(),
+            body: JSON.stringify(payload)
+        });
 
-
-    const data = await res.json();
-    setLoading(false);
-
-    if (res.ok) router.push("/dashboard");
-    else alert(data.error || "Onboarding failed");
+        const data = await res.json();
+        if (res.ok) {
+            router.push("/dashboard");
+        } else {
+            alert(data.error || "Onboarding failed. Please check your details.");
+        }
+    } catch (error) {
+        alert("A network error occurred. Please try again.");
+    } finally {
+        setLoading(false);
+    }
   };
 
-  // Helper for input classes to keep JSX clean
-  const inputClass = "w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-[#02042b] font-medium placeholder:text-slate-400 outline-none focus:border-[#3395FF] focus:ring-4 focus:ring-blue-500/10 transition-all";
-  const labelClass = "block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1";
-  const iconClass = "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg";
+  const inputClass = "w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-secondary font-bold placeholder:text-slate-300 outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all shadow-sm";
+  const labelClass = "block text-[11px] font-black uppercase tracking-[0.15em] text-slate-400 mb-2.5 px-1";
+  const iconClass = "absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl transition-colors group-focus-within:text-primary";
 
   return (
-    <div className="min-h-screen w-full bg-[#f8fbff] text-[#02042b] font-sans selection:bg-blue-100 flex flex-col relative">
-
-      {/* Background Effects */}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-40">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-      </div>
-
-      {/* Navbar */}
-      <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-4 bg-white/80 backdrop-blur-md border-b border-slate-200">
+    <div className="min-h-screen w-full bg-[#fcfdfe] text-secondary flex flex-col font-sans">
+      
+      {/* Header */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100 px-6 md:px-12 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" className="w-10 h-10" />
-          <h1 className="text-xl font-bold text-[#02042b] tracking-tight">NexusPay</h1>
+          <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <img src="/logo.png" className="w-6 h-6 brightness-0 invert" alt="Logo" />
+          </div>
+          <span className="text-xl font-black text-secondary tracking-tight">NexusPay</span>
         </div>
-        <div className="flex items-center gap-4">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:block">Step 1 of 1</span>
+        <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-primary rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                <MdSecurity /> Secured Session
+            </div>
             <LogoutButton />
         </div>
       </nav>
 
-      <div className="flex-1 flex justify-center items-start py-12 px-4 relative z-10 overflow-y-auto">
-
-        <div className="w-full max-w-4xl bg-white shadow-xl shadow-blue-500/5 border border-slate-100 rounded-[2.5rem] p-8 md:p-12 animate-[fadeIn_0.5s_ease-out]">
-
-          <div className="mb-12">
-            <h1 className="text-4xl font-black text-[#02042b] mb-3">Merchant Onboarding</h1>
-            <p className="text-slate-500 font-medium text-lg">Complete your profile to activate your live payment gateway.</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-12">
-
-            {/* SECTION 1: Business Details */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#3395FF] flex items-center justify-center font-bold text-sm">1</div>
-                  <h3 className="text-sm font-black text-[#02042b] uppercase tracking-widest">Business Details</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="col-span-2">
-                  <label className={labelClass}>Registered Business Name</label>
-                  <div className="relative group">
-                    <MdBusiness className={`${iconClass} group-focus-within:text-[#3395FF] transition-colors`} />
-                    <input name="businessName" required value={form.businessName} onChange={update} placeholder="Ex: Acme Corp Pvt Ltd" className={inputClass} />
-                  </div>
+      <div className="flex-1 flex flex-col items-center pt-32 pb-20 px-6">
+        
+        {/* Step Indicator */}
+        <div className="w-full max-w-4xl mb-12 flex justify-between relative">
+            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -translate-y-1/2 z-0"></div>
+            {[1, 2, 3].map(step => (
+                <div key={step} className="relative z-10 flex flex-col items-center gap-3 group">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 border-4 border-[#fcfdfe] ${
+                        activeStep >= step ? "bg-primary text-white shadow-xl shadow-blue-500/30 scale-110" : "bg-slate-200 text-slate-500"
+                    }`}>
+                        {step === 1 && <MdBusiness className="text-2xl" />}
+                        {step === 2 && <MdVerifiedUser className="text-2xl" />}
+                        {step === 3 && <MdAccountBalance className="text-2xl" />}
+                    </div>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${activeStep >= step ? "text-primary" : "text-slate-400"}`}>
+                        {step === 1 ? "Business" : step === 2 ? "Identity" : "Banking"}
+                    </span>
                 </div>
-
-                <div>
-                  <label className={labelClass}>Category</label>
-                  <div className="relative group">
-                    <MdCategory className={`${iconClass} group-focus-within:text-[#3395FF] transition-colors`} />
-                    <select name="category" required value={form.category} onChange={update} className={`${inputClass} appearance-none cursor-pointer`}>
-                      <option value="" className="text-slate-400">Select Category</option>
-                      <option>Grocery</option>
-                      <option>Electronics</option>
-                      <option>Restaurant</option>
-                      <option>Services</option>
-                      <option>Education</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className={labelClass}>Website (Optional)</label>
-                  <div className="relative group">
-                    <MdLanguage className={`${iconClass} group-focus-within:text-[#3395FF] transition-colors`} />
-                    <input name="website" value={form.website} onChange={update} placeholder="https://mercurion.com" className={inputClass} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* SECTION 2: Legal & Identity */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center font-bold text-sm">2</div>
-                  <h3 className="text-sm font-black text-[#02042b] uppercase tracking-widest">Identity Verification</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className={labelClass}>PAN Number</label>
-                  <div className="relative group">
-                    <MdBadge className={`${iconClass} group-focus-within:text-indigo-500 transition-colors`} />
-                    <input name="pan" required value={form.pan} onChange={update} maxLength={10} placeholder="ABCDE1234F" className={`${inputClass} uppercase font-mono`} />
-                  </div>
-                </div>
-
-                <div>
-                  <label className={labelClass}>Aadhaar Number</label>
-                  <div className="relative group">
-                    <MdFingerprint className={`${iconClass} group-focus-within:text-indigo-500 transition-colors`} />
-                    <input name="aadhar" required value={form.aadhar} onChange={update} placeholder="0000 0000 0000" className={`${inputClass} font-mono`} />
-                  </div>
-                </div>
-
-                <div>
-                  <label className={labelClass}>Mobile Number</label>
-                  <div className="relative group">
-                    <MdPhone className={`${iconClass} group-focus-within:text-indigo-500 transition-colors`} />
-                    <input name="mobile" required value={form.mobile} onChange={update} maxLength={10} placeholder="9876543210" className={`${inputClass} font-mono`} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* SECTION 3: Banking */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center font-bold text-sm">3</div>
-                  <h3 className="text-sm font-black text-[#02042b] uppercase tracking-widest">Banking Information</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="col-span-2 md:col-span-1">
-                  <label className={labelClass}>Account Holder Name</label>
-                  <div className="relative group">
-                    <MdPerson className={`${iconClass} group-focus-within:text-purple-500 transition-colors`} />
-                    <input name="accountHolder" required value={form.accountHolder} onChange={update} placeholder="Name as per Bank" className={inputClass} />
-                  </div>
-                </div>
-
-                <div className="col-span-2 md:col-span-1">
-                  <label className={labelClass}>IFSC Code</label>
-                  <div className="relative group">
-                    <MdAccountBalance className={`${iconClass} group-focus-within:text-purple-500 transition-colors`} />
-                    <input name="ifsc" required value={form.ifsc} onChange={update} maxLength={11} placeholder="SBIN0001234" className={`${inputClass} uppercase font-mono`} />
-                  </div>
-                </div>
-
-                <div className="col-span-2">
-                  <label className={labelClass}>Account Number</label>
-                  <div className="relative group">
-                    <MdNumbers className={`${iconClass} group-focus-within:text-purple-500 transition-colors`} />
-                    <input name="accountNumber" required value={form.accountNumber} onChange={update} maxLength={18} placeholder="000000000000" className={`${inputClass} font-mono`} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-8 border-t border-slate-100">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`hover:cursor-pointer w-full py-5 rounded-2xl font-black text-white shadow-xl shadow-blue-500/20 transition-all transform active:scale-[0.98] uppercase tracking-widest text-sm ${loading ? "bg-slate-400 cursor-wait" : "bg-[#3395FF] hover:bg-blue-600"
-                  }`}
-              >
-                {loading ? "Verifying Details..." : "Complete Activation"}
-              </button>
-              <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-tighter mt-6">
-                  By clicking activate, you agree to our <a href="#" className="text-[#3395FF] hover:underline">Terms of Service</a> and <a href="#" className="text-[#3395FF] hover:underline">Privacy Policy</a>
-              </p>
-            </div>
-
-          </form>
+            ))}
         </div>
+
+        <div className="w-full max-w-4xl bg-white rounded-[3rem] border border-slate-100 shadow-2xl shadow-blue-900/5 overflow-hidden">
+            <div className="bg-slate-50/50 px-10 py-8 border-b border-slate-100">
+                <h1 className="text-3xl font-black text-secondary tracking-tight mb-2">Merchant Activation</h1>
+                <p className="text-slate-500 font-medium">Complete your details to start accepting live payments.</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-10 md:p-14 space-y-14">
+                
+                {/* BUSINESS SECTION */}
+                <div className={activeStep === 1 ? "block" : "hidden"}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="col-span-2">
+                            <label className={labelClass}>Registered Business Name</label>
+                            <div className="relative group">
+                                <MdBusiness className={iconClass} />
+                                <input name="businessName" required value={form.businessName} onChange={update} placeholder="Ex: Acme Corp Private Limited" className={inputClass} />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className={labelClass}>Business Category</label>
+                            <div className="relative group">
+                                <MdCategory className={iconClass} />
+                                <select name="category" required value={form.category} onChange={update} className={`${inputClass} appearance-none cursor-pointer`}>
+                                    <option value="">Select Category</option>
+                                    <option>E-commerce</option>
+                                    <option>Education</option>
+                                    <option>Services</option>
+                                    <option>Gaming</option>
+                                    <option>Real Estate</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className={labelClass}>Business Website</label>
+                            <div className="relative group">
+                                <MdLanguage className={iconClass} />
+                                <input name="website" value={form.website} onChange={update} placeholder="https://yourwebsite.com" className={inputClass} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* IDENTITY SECTION */}
+                <div className={activeStep === 2 ? "block" : "hidden"}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div>
+                            <label className={labelClass}>Business PAN</label>
+                            <div className="relative group">
+                                <MdBadge className={iconClass} />
+                                <input name="pan" required value={form.pan} onChange={update} maxLength={10} placeholder="ABCDE1234F" className={`${inputClass} uppercase font-mono`} />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className={labelClass}>Aadhaar Number</label>
+                            <div className="relative group">
+                                <MdFingerprint className={iconClass} />
+                                <input name="aadhar" required value={form.aadhar} onChange={update} placeholder="0000 0000 0000" className={`${inputClass} font-mono`} />
+                            </div>
+                        </div>
+
+                        <div className="col-span-2">
+                            <label className={labelClass}>Registered Mobile Number</label>
+                            <div className="relative group">
+                                <MdPhone className={iconClass} />
+                                <input name="mobile" required value={form.mobile} onChange={update} maxLength={10} placeholder="9876543210" className={`${inputClass} font-mono`} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* BANKING SECTION */}
+                <div className={activeStep === 3 ? "block" : "hidden"}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="col-span-2">
+                            <label className={labelClass}>Account Holder Name</label>
+                            <div className="relative group">
+                                <MdPerson className={iconClass} />
+                                <input name="accountHolder" required value={form.accountHolder} onChange={update} placeholder="Exactly as per bank records" className={inputClass} />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className={labelClass}>Bank IFSC Code</label>
+                            <div className="relative group">
+                                <MdAccountBalance className={iconClass} />
+                                <input name="ifsc" required value={form.ifsc} onChange={update} maxLength={11} placeholder="HDFC0001234" className={`${inputClass} uppercase font-mono`} />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className={labelClass}>Account Number</label>
+                            <div className="relative group">
+                                <MdNumbers className={iconClass} />
+                                <input name="accountNumber" required value={form.accountNumber} onChange={update} maxLength={18} placeholder="0000 0000 0000 0000" className={`${inputClass} font-mono`} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* NAVIGATION BUTTONS */}
+                <div className="pt-10 flex flex-col md:flex-row gap-4">
+                    {activeStep > 1 && (
+                        <button 
+                            type="button" 
+                            onClick={() => setActiveStep(activeStep - 1)}
+                            className="flex-1 btn-secondary py-5 uppercase tracking-widest text-sm"
+                        >
+                            Back
+                        </button>
+                    )}
+                    
+                    {activeStep < 3 ? (
+                        <button 
+                            type="button" 
+                            onClick={() => setActiveStep(activeStep + 1)}
+                            className="flex-[2] btn-primary py-5 uppercase tracking-widest text-sm"
+                        >
+                            Continue <MdArrowForward className="text-xl" />
+                        </button>
+                    ) : (
+                        <button 
+                            type="submit" 
+                            disabled={loading}
+                            className="flex-[2] btn-primary py-5 uppercase tracking-widest text-sm disabled:opacity-50"
+                        >
+                            {loading ? (
+                                <div className="flex items-center gap-2">
+                                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                                    <span>Verifying...</span>
+                                </div>
+                            ) : "Complete Activation"}
+                        </button>
+                    )}
+                </div>
+
+                <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
+                    <MdSecurity className="text-3xl text-primary mt-1" />
+                    <div>
+                        <h4 className="text-sm font-black text-secondary uppercase tracking-tight mb-1">Your data is safe with us</h4>
+                        <p className="text-xs font-medium text-slate-500 leading-relaxed">
+                            We use bank-grade 256-bit AES encryption to secure your details. Your sensitive information is never shared with third parties.
+                        </p>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <p className="mt-10 text-slate-400 font-bold text-xs uppercase tracking-widest text-center">
+            NexusPay India Private Limited • PCI-DSS Compliant Infrastructure
+        </p>
       </div>
     </div>
   );

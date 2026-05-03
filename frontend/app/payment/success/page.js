@@ -36,7 +36,6 @@ export default function PaymentSuccess() {
     setFormattedTime(ft);
     setMname(mn);
 
-    // Countdown redirect
     const interval = setInterval(() => {
       setRedirectTime((prev) => {
         if (prev <= 1) {
@@ -52,36 +51,31 @@ export default function PaymentSuccess() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f8fbff] flex flex-col items-center justify-center p-4 font-sans text-[#02042b] relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8fbff] flex flex-col items-center justify-center p-4 font-sans text-[#02042B] relative overflow-hidden">
       
-      {/* BACKGROUND DECOR */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full" />
         <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full" />
       </div>
 
-      {/* Header */}
       <div className="flex items-center gap-3 mb-10 relative z-10 animate-in fade-in slide-in-from-top-4 duration-700">
         <img src="/logo.png" className="w-10 h-10" alt="Logo" />
         <span className="text-2xl font-black tracking-tight">NexusPay</span>
       </div>
 
-      {/* Card */}
-      <div className="w-full max-w-md bg-white shadow-2xl shadow-blue-500/10 rounded-[2.5rem] overflow-hidden border border-slate-100 relative z-10 animate-in zoom-in-95 duration-500">
+      <div className="w-full max-w-md bg-white shadow-2xl shadow-blue-500/10 rounded-3xl overflow-hidden border border-slate-100 relative z-10 animate-in zoom-in-95 duration-500">
         
         <div className="p-10 text-center">
-            {/* Animated Success Icon */}
             <div className="flex justify-center mb-8">
-                <div className="w-24 h-24 rounded-full bg-green-50 flex items-center justify-center text-green-500 text-6xl shadow-inner shadow-green-200/20">
+                <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 text-6xl shadow-inner shadow-blue-200/20">
                     <MdCheckCircle className="animate-in zoom-in-50 duration-500" />
                 </div>
             </div>
 
-            <h2 className="text-3xl font-black mb-2 tracking-tight">Payment Successful</h2>
+            <h2 className="text-3xl font-black mb-2 tracking-tight text-[#02042B]">Payment Successful</h2>
             <p className="text-slate-400 font-medium text-sm mb-10 uppercase tracking-widest leading-relaxed">Transaction Receipt</p>
 
-            {/* Receipt Details */}
-            <div className="bg-slate-50/50 rounded-3xl p-8 border border-slate-100 text-left space-y-6">
+            <div className="bg-slate-50/50 rounded-2xl p-8 border border-slate-100 text-left space-y-6">
                 <div className="flex justify-between items-start">
                     <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Paid To</p>
@@ -101,7 +95,7 @@ export default function PaymentSuccess() {
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Date & Time</p>
                         <span className="text-xs font-bold text-slate-600">{formattedTime}</span>
                     </div>
-                    <div className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                    <div className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-[10px] font-black uppercase tracking-widest">
                         Confirmed
                     </div>
                 </div>
@@ -125,5 +119,4 @@ export default function PaymentSuccess() {
       </footer>
     </div>
   );
-
 }

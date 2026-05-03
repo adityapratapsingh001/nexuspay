@@ -1,6 +1,15 @@
 export const getHeaders = () => {
-    const token = localStorage.getItem("token");
-    const email = localStorage.getItem("userEmail") || "demo@nexuspay.com";
+    let token = null;
+    let email = "demo@nexuspay.com";
+
+    try {
+        if (typeof window !== "undefined" && window.localStorage) {
+            token = localStorage.getItem("token");
+            email = localStorage.getItem("userEmail") || email;
+        }
+    } catch (e) {
+        // Silently ignore localStorage errors during SSR/Build
+    }
 
     const headers = {
         "Content-Type": "application/json",
@@ -10,7 +19,6 @@ export const getHeaders = () => {
         headers["Authorization"] = `Bearer ${token}`;
     }
 
-    // Keeping this for backward compatibility if backend still expects it in some places
     headers["X-User-Email"] = email;
 
     return headers;

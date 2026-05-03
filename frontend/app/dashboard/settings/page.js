@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { MdSettings, MdLock, MdCheckCircle, MdError } from "react-icons/md";
+import { MdSettings, MdLock, MdCheckCircle, MdError, MdShield, MdDeleteOutline, MdPerson, MdSecurity } from "react-icons/md";
 import Toast from "@/components/Toast";
 import { getHeaders } from "@/utils/api";
 
@@ -39,42 +39,59 @@ export default function SettingsPage() {
         showToast("Password updated successfully");
         setPasswords({ current: "", new: "", confirm: "" });
       } else {
-        showToast(data.error || "Failed to update password", "error");
+        showToast(data.error || "Update failed", "error");
       }
     } catch (error) {
-      showToast("Network error occurred", "error");
+      showToast("Network error", "error");
     } finally {
       setLoading(false);
     }
   };
 
+  const labelClass = "text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block";
+  const inputClass = "w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 font-medium outline-none focus:border-blue-500 transition-all placeholder:text-gray-200";
+
   return (
-    <div className="p-8 md:p-12 animate-in fade-in duration-700 max-w-2xl">
+    <div className="flex-1 min-h-screen bg-gray-50/30 p-6 md:p-10 transition-all duration-300">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       
-      <div className="mb-12">
-        <h1 className="text-4xl font-black text-[#02042b] tracking-tight flex items-center gap-4">
-            <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
+      <div className="mb-10 max-w-2xl">
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+            <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center text-gray-400">
                 <MdSettings />
             </div>
             Settings
         </h1>
-        <p className="text-slate-500 font-medium text-lg mt-4">Manage your account preferences and security.</p>
+        <p className="text-sm text-gray-500 mt-2">Manage your merchant account preferences and security.</p>
       </div>
 
-      <div className="space-y-8">
-        <section className="bg-white border border-slate-100 rounded-[2.5rem] p-10 shadow-sm">
-            <h3 className="text-xl font-black text-[#02042b] mb-8 flex items-center gap-3">
-                <MdLock className="text-blue-500" /> Security & Password
-            </h3>
+      <div className="max-w-2xl space-y-10">
+        
+        {/* Profile */}
+        <div className="premium-card p-8 flex items-center gap-5">
+            <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center text-primary text-2xl">
+                <MdPerson />
+            </div>
+            <div>
+                <h3 className="text-lg font-bold text-gray-900 leading-none mb-1">Business Profile</h3>
+                <p className="text-xs text-gray-400 font-medium uppercase tracking-tight">Active Merchant</p>
+            </div>
+        </div>
+
+        {/* Security */}
+        <section className="premium-card p-8">
+            <div className="flex items-center gap-2 mb-8 text-primary">
+                <MdSecurity className="text-xl" />
+                <h3 className="text-xs font-bold uppercase tracking-widest">Security & Credentials</h3>
+            </div>
             
             <form onSubmit={handleResetPassword} className="space-y-6">
                 <div>
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Current Password</label>
+                    <label className={labelClass}>Current Password</label>
                     <input 
                         type="password" 
                         required
-                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all font-medium"
+                        className={inputClass}
                         value={passwords.current}
                         onChange={e => setPasswords({...passwords, current: e.target.value})}
                     />
@@ -82,21 +99,21 @@ export default function SettingsPage() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">New Password</label>
+                        <label className={labelClass}>New Password</label>
                         <input 
                             type="password" 
                             required
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all font-medium"
+                            className={inputClass}
                             value={passwords.new}
                             onChange={e => setPasswords({...passwords, new: e.target.value})}
                         />
                     </div>
                     <div>
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Confirm New Password</label>
+                        <label className={labelClass}>Confirm New Password</label>
                         <input 
                             type="password" 
                             required
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all font-medium"
+                            className={inputClass}
                             value={passwords.confirm}
                             onChange={e => setPasswords({...passwords, confirm: e.target.value})}
                         />
@@ -105,20 +122,29 @@ export default function SettingsPage() {
 
                 <button 
                     disabled={loading}
-                    className="mt-4 px-10 py-4 bg-[#02042b] text-white font-black rounded-2xl hover:bg-slate-800 transition-all disabled:opacity-50 flex items-center gap-3 text-xs uppercase tracking-widest"
+                    className="btn-primary py-3 px-8 text-xs uppercase tracking-widest shadow-none disabled:opacity-50"
                 >
                     {loading ? "Updating..." : "Update Password"}
                 </button>
             </form>
         </section>
 
-        <section className="bg-red-50/50 border border-red-100 rounded-[2.5rem] p-10">
-             <h3 className="text-lg font-black text-red-600 mb-2">Danger Zone</h3>
-             <p className="text-red-400 text-sm font-medium mb-6">Irreversible actions for your account.</p>
-             <button className="px-8 py-4 bg-white border border-red-200 text-red-600 font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">
-                Deactivate Merchant Account
+        {/* Danger */}
+        <section className="bg-red-50/50 border border-red-100 rounded-xl p-8">
+             <div className="flex items-center gap-2 mb-4 text-red-600">
+                 <MdDeleteOutline className="text-xl" />
+                 <h3 className="text-sm font-bold uppercase tracking-widest">Danger Zone</h3>
+             </div>
+             
+             <p className="text-xs text-red-500/70 font-medium mb-6 leading-relaxed">
+                 Closing your account will disable all payment links and API access. This action cannot be undone.
+             </p>
+             
+             <button className="px-6 py-2.5 bg-white border border-red-200 text-red-600 font-bold rounded-lg text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">
+                Deactivate Account
              </button>
         </section>
+
       </div>
     </div>
   );
